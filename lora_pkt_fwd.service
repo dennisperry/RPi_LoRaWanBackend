@@ -1,0 +1,16 @@
+[Unit]
+Description=Semtech Packet Forwarder
+Documentation=https://github.com/Lora-net/packet_forwarder
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=pi
+Group=pi
+ExecStart=/usr/bin/lora_pkt_fwd
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+Alias=lora_pkt_fwd.service
+

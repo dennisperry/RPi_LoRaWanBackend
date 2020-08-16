@@ -1,0 +1,145 @@
+# This configuration provides a Semtech UDP packet-forwarder backend and
+# integrates with a MQTT broker. Many options and defaults have been omitted
+# for simplicity.
+#
+# See https://www.chirpstack.io/gateway-bridge/install/config/ for a full
+# configuration example and documentation.
+
+[general]
+# debug=5, info=4, warning=3, error=2, fatal=1, panic=0
+log_level=4
+
+# Log to syslog.
+#
+# When set to true, log messages are being written to syslog.
+log_to_syslog=true
+
+# Gateway backend configuration.
+[backend]
+# Backend type.
+#
+# Valid options are:
+#   * semtech_udp
+#   * concentratord
+#   * basic_station
+type="semtech_udp"
+
+
+# Semtech UDP packet-forwarder backend.
+[backend.semtech_udp]
+
+# ip:port to bind the UDP listener to
+#
+# Example: 0.0.0.0:1700 to listen on port 1700 for all network interfaces.
+# This is the listener to which the packet-forwarder forwards its data
+# so make sure the 'serv_port_up' and 'serv_port_down' from your
+# packet-forwarder matches this port.
+udp_bind = "localhost:1700"
+
+# Skip the CRC status-check of received packets
+#
+# This is only has effect when the packet-forwarder is configured to forward
+# LoRa frames with CRC errors.
+skip_crc_check = false
+
+# Fake RX timestamp.
+#
+# Fake the RX time when the gateway does not have GPS, in which case
+# the time would otherwise be unset.
+fake_rx_time=true
+
+# Stats interval.
+#
+# This defines the interval in which the ChirpStack Gateway Bridge forwards
+# the uplink / downlink statistics.
+stats_interval="30s"
+
+# Ping interval.
+ping_interval="1m0s"
+
+# Read timeout.
+#
+# This interval must be greater than the configured ping interval.
+read_timeout="1m5s"
+
+# Write timeout.
+write_timeout="1s"
+
+# LoRa gateway configuration.
+[gateway]
+
+# Antenna gain (dB).
+antenna_gain=0
+
+# Public LoRaWAN network.
+lorawan_public=true
+
+# Gateway vendor / model.
+#
+# This configures various vendor and model specific settings like the min / max
+# frequency, TX gain table.
+model="rak_2245_us915"
+
+# Gateway vendor / model flags.
+model_flags=["GNSS",]
+
+# Gateway ID.
+gateway_id="dca632fffe878d1e"
+
+# LoRa concentrator configuration.
+[gateway.concentrator]
+
+# Multi spreading-factor channels (LoRa).
+multi_sf_channels=[
+  903900000,
+  904100000,
+  904300000,
+  904500000,
+  904700000,
+  904900000,
+  905100000,
+  905300000,
+]
+
+# LoRa std channel (single spreading-factor).
+[gateway.concentrator.lora_std]
+frequency=904600000
+bandwidth=500000
+spreading_factor=8
+
+# Integration configuration.
+[integration]
+# Payload marshaler.
+#
+# This defines how the MQTT payloads are encoded. Valid options are:
+# * protobuf:  Protobuf encoding
+# * json:      JSON encoding (easier for debugging, but less compact than 'protobuf')
+marshaler="protobuf"
+
+# MQTT integration configuration.
+[integration.mqtt]
+# Event topic template.
+event_topic_template="gateway/{{ .GatewayID }}/event/{{ .EventType }}"
+
+# Command topic template.
+command_topic_template="gateway/{{ .GatewayID }}/command/#"
+
+# MQTT authentication.
+[integration.mqtt.auth]
+# Type defines the MQTT authentication type to use.
+#
+# Set this to the name of one of the sections below.
+type="generic"
+
+# Generic MQTT authentication.
+[integration.mqtt.auth.generic]
+# MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
+server="tcp://127.0.0.1:1883"
+#server="tcp://192.168.1.103:1883"
+
+# Connect with the given username (optional)
+username=""
+
+# Connect with the given password (optional)
+password=""
+

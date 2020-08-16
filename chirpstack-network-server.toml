@@ -1,0 +1,210 @@
+# This configuration configures ChirpStack Network Server for the EU868 band using a MQTT
+# broker to communicate with the gateways. Many options and defaults have been
+# omitted for simplicity.
+#
+# For other bands, see the ./examples/ sub-directory.
+#
+# See https://www.chirpstack.io/network-server/install/config/ for a full
+# configuration example and documentation.
+[general]
+#log level
+# debug=5, info=4, warning=3, error=2, fatal=1, panic=0
+log_level=4
+
+# Log to syslog.
+#
+# When set to true, log messages are being written to syslog.
+log_to_syslog=false
+
+# PostgreSQL settings.
+#
+# Please note that PostgreSQL 9.5+ is required.
+[postgresql]
+# PostgreSQL dsn (e.g.: postgres://user:password@hostname/database?sslmode=disable).
+#
+# Besides using an URL (e.g. 'postgres://user:password@hostname/database?sslmode=disable')
+# it is also possible to use the following format:
+# 'user=chirpstack_ns dbname=chirpstack_ns sslmode=disable'.
+#
+# The following connection parameters are supported:
+#
+# * dbname - The name of the database to connect to
+# * user - The user to sign in as
+# * password - The user's password
+# * host - The host to connect to. Values that start with / are for unix domain sockets. (default is localhost)
+# * port - The port to bind to. (default is 5432)
+# * sslmode - Whether or not to use SSL (default is require, this is not the default for libpq)
+# * fallback_application_name - An application_name to fall back to if one isn't provided.
+# * connect_timeout - Maximum wait for connection, in seconds. Zero or not specified means wait indefinitely.
+# * sslcert - Cert file location. The file must contain PEM encoded data.
+# * sslkey - Key file location. The file must contain PEM encoded data.
+# * sslrootcert - The location of the root certificate file. The file must contain PEM encoded data.
+#dbname="chirpstack_ns"
+#user="chirpstack_ns"
+#password="dbpassword"
+
+#
+# Valid values for sslmode are:
+#
+# * disable - No SSL
+# * require - Always SSL (skip verification)
+# * verify-ca - Always SSL (verify that the certificate presented by the server was signed by a trusted CA)
+# * verify-full - Always SSL (verify that the certification presented by the server was signed by a trusted CA and the server host name matches the one in the certificate)
+#dsn="postgres://localhost/chirpstack_ns?sslmode=disable"
+#dsn="postgres://chirpstack_ns:dbpassword@localhost/chirpstack_ns?sslmode=disable"
+dsn="user=chirpstack_ns password=dbpassword dbname=chirpstack_ns host=localhost sslmode=disable"
+
+
+# Redis settings
+#
+# Please note that Redis 2.6.0+ is required.
+[redis]
+# Redis url (e.g. redis://user:password@hostname/0)
+#
+# For more information about the Redis URL format, see:
+# https://www.iana.org/assignments/uri-schemes/prov/redis
+url="redis://localhost:6379"
+
+
+# Network-server settings.
+[network_server]
+# Network identifier (NetID, 3 bytes) encoded as HEX (e.g. 010203)
+#net_id="000000"
+net_id="032177"
+
+# Time to wait for uplink de-duplication.
+#
+# This is the time that ChirpStack Network Server will wait for other gateways to receive
+# the same uplink frame. Valid units are 'ms' or 's'.
+# Please note that this value has influence on the uplink / downlink
+# roundtrip time. Setting this value too high means ChirpStack Network Server will be
+# unable to respond to the device within its receive-window.
+deduplication_delay="200ms"
+
+# Device session expiration.
+#
+# The TTL value defines the time after which a device-session expires
+# after no activity. Valid units are 'ms', 's', 'm', 'h'. Note that these
+# values can be combined, e.g. '24h30m15s'.
+device_session_ttl="744h0m0s"
+
+# Get downlink data delay.
+#
+# This is the time that ChirpStack Network Server waits between forwarding data to the
+# application-server and reading data from the queue. A higher value
+# means that the application-server has more time to schedule a downlink
+# queue item which can be processed within the same uplink / downlink
+# transaction.
+# Please note that this value has influence on the uplink / downlink
+# roundtrip time. Setting this value too high means ChirpStack Network Server will be
+# unable to respond to the device within its receive-window.
+get_downlink_data_delay="100ms"
+
+# LoRaWAN regional band configuration.
+#
+# Note that you might want to consult the LoRaWAN Regional Parameters
+# specification for valid values that apply to your region.
+# See: https://www.lora-alliance.org/lorawan-for-developers
+[network_server.band]
+name="US915"
+
+enabled_uplink_channels=[8, 9, 10, 11, 12, 13, 14, 15, 65]
+
+# Network-server API
+#
+# This is the network-server API that is used by ChirpStack Application Server or other
+# custom components interacting with ChirpStack Network Server.
+[network_server.api]
+# ip:port to bind the api server
+bind="0.0.0.0:8000"
+
+# Scheduler settings
+#
+# These settings affect the multicast, Class-B and Class-C downlink queue
+# scheduler.
+[network_server.scheduler]
+# Scheduler interval
+#
+# The interval in which the downlink scheduler for multicast, Class-B and
+# Class-C runs.
+scheduler_interval="1s"
+
+# Class-C settings.
+[network_server.scheduler.class_c]
+# Downlink lock duration
+#
+# Contains the duration to lock the downlink Class-C transmissions
+# after a preceeding downlink tx (per device).
+downlink_lock_duration="2s"
+
+# Multicast gateway delay.
+#
+# In case of a multi-gateway multicast downlink, this delay will added to
+# the transmission time of each downlink to avoid collisions between overlapping
+# gateways.
+multicast_gateway_delay="2s"
+
+# Backend defines the gateway backend settings.
+#
+# The gateway backend handles the communication with the gateway(s) part of
+# the LoRaWAN network.
+[network_server.gateway.backend]
+# Backend
+type="mqtt"
+
+
+# MQTT gateway backend settings.
+#
+# This is the backend communicating with the LoRa gateways over a MQTT broker.
+[network_server.gateway.backend.mqtt]
+# MQTT topic templates for the different MQTT topics.
+#
+# The meaning of these topics are documented at:
+# https://www.chirpstack.io/gateway-bridge/
+#
+# The default values match the default expected configuration of the
+# ChirpStack Gateway Bridge MQTT backend. Therefore only change these values when
+# absolutely needed.
+
+# Event topic template.
+event_topic="gateway/+/event/+"
+
+# Command topic template.
+#
+# Use:
+#   * "{{ .GatewayID }}" as an substitution for the LoRa gateway ID
+#   * "{{ .CommandType }}" as an substitution for the command type
+command_topic_template="gateway/{{ .GatewayID }}/command/{{ .CommandType }}"
+
+# MQTT server (e.g. scheme://host:port where scheme is tcp, ssl or ws)
+server="tcp://localhost:1883"
+
+# Connect with the given username (optional)
+username=""
+
+# Connect with the given password (optional)
+password=""
+
+
+# Metrics collection settings.
+[metrics]
+# Timezone
+#
+# The timezone is used for correctly aggregating the metrics (e.g. per hour,
+# day or month).
+# Example: "Europe/Amsterdam" or "Local" for the the system's local time zone.
+timezone="Local"
+
+
+# Join-server settings.
+[join_server]
+
+# Default join-server settings.
+#
+# This join-server will be used when resolving the JoinEUI is set to false
+# or as a fallback when resolving the JoinEUI fails.
+[join_server.default]
+# hostname:port of the default join-server
+#
+# This API is provided by ChirpStack Application Server.
+server="http://localhost:8003"
