@@ -1,5 +1,5 @@
 # RPi_LoRaWanBackend
-Intallation and configuration instructions for LoRa Micro Gateway using Semtech packet_forwarder and Chirpstack Gateway-Bridge, Network-Server and Application-Server.
+Installation and configuration instructions for LoRa Micro Gateway using Semtech packet_forwarder and Chirpstack Gateway-Bridge, Network-Server and Application-Server.
 
 **General Overview**
 The major components to make the LoRaWan backend include; the Semtech packet forwarder, the Chirpstack-gateway-bridge, the Chirpstack-network-server and the Chirpstack-application-server.
@@ -7,7 +7,7 @@ The major components to make the LoRaWan backend include; the Semtech packet for
 **Major Components**
 Semtech packet_forwarder
 1. Build the Lora-net/lora_gateway library. Code here: https://github.com/Lora-net/lora_gateway . This library is needed to build the next item.
-2. Build the Lora-net/packet_forwarder. Code here: https://github.com/Lora-net/packet_forwarder . This code will need several modifications. First; you will likely want to put the configuration files in /etc/packet_forwarder/. To do this you will need to edit the location the packet_forwarder looks for configureation files. The line that set the location are found at the beginning of main().
+2. Build the Lora-net/packet_forwarder. Code here: https://github.com/Lora-net/packet_forwarder . This code will need several modifications. First; you will likely want to put the configuration files in /etc/packet_forwarder/. To do this you will need to edit the location the packet_forwarder looks for configuration files. The line that set the location are found at the beginning of main().
 Second; you will likely want to add in a reset of your RAK concentrator. My RAK831 used BCM GPIO17, expansion connector pin 11, wiringPi GPIO0. I used the wiringPi library to make my changes.
 Third; you will need to specify the path to the tty port your GPS is connected. This can be found around line 162. There is also likely a syntax for putting this in the global_conf.json but I've not seen an example of this.
 3. The packet forwarder will pass its packets to an MQTT server. Mosquitto can be installed for this purpose.
